@@ -20,3 +20,9 @@ Dependencies:
 
 - https://github.com/mjibson/esc
 - https://github.com/yonaskolb/XcodeGen
+
+Example:
+
+    $ startapp -name Foo -kit -tests -uitests -teamid YOUR_TEAM_ID
+    $ cd Foo
+    $ make
