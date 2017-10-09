@@ -17,6 +17,7 @@ var (
 	hasKit      = flag.Bool("kit", false, "Adds a Kit framework to project")
 	hasTests    = flag.Bool("tests", false, "Adds Tests to project")
 	hasUITests  = flag.Bool("uitests", false, "Adds UI Tests to project")
+	teamID      = flag.String("teamid", "", "Apple Developer account Team ID")
 	liveFlag    = flag.Bool("liveassets", false, "Serve Static Assets from Disk relative to CWD")
 )
 
@@ -25,6 +26,7 @@ type fileContext struct {
 	HasKit     bool
 	HasTests   bool
 	HasUITests bool
+	TeamID     string
 }
 
 func main() {
@@ -35,6 +37,7 @@ func main() {
 		HasKit:     *hasKit,
 		HasTests:   *hasTests,
 		HasUITests: *hasUITests,
+		TeamID:     *teamID,
 	}
 
 	dirs := []string{}

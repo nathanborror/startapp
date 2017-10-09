@@ -1,7 +1,7 @@
 name: {{.Name}}
 settings:
   PRODUCT_BUNDLE_IDENTIFIER: co.nthn.$(PRODUCT_NAME)
-  DEVELOPMENT_TEAM: 294VZ3T33E
+  DEVELOPMENT_TEAM: {{.TeamID}}
 targets:
   {{.Name}}:
     type: application
