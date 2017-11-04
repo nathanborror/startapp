@@ -1,0 +1,54 @@
+scalar ID
+
+scalar Timestamp
+
+enum Status {
+    READER
+    MODERATOR
+    SUPERUSER
+}
+
+interface Node {
+    id: ID!
+}
+
+type Account implements Node {
+    id: ID!
+    name: String!
+    email: String!
+    isActive: Boolean!
+    status: Status!
+    created: Timestamp!
+    modified: Timestamp!
+}
+
+input RegisterInput {
+    name: String!
+    email: String!
+    password: String!
+}
+
+input ConnectInput {
+    email: String!
+    password: String!
+}
+
+type Session {
+    account: Account!
+    token: String!
+}
+
+type Query {
+    viewer: Account!
+    node(id: ID!): Node
+}
+
+type Mutation {
+    register(input: RegisterInput!): Session
+    connect(input: ConnectInput!): Session
+}
+
+schema {
+    query: Query
+    mutation: Mutation
+}

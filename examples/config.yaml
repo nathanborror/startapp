@@ -1,0 +1,5 @@
+domain: example.com
+schema: schema.graphql
+has-client-backend: true
+has-client-tests: true
+has-client-bundleid: com.example.Example

@@ -1,0 +1,46 @@
+{{ $client := .IOSClient }}
+name: {{.Name|titlecase}}
+settings:
+  PRODUCT_BUNDLE_IDENTIFIER: co.nthn.$(PRODUCT_NAME)
+  DEVELOPMENT_TEAM: {{$client.TeamID}}
+targets:
+  {{.Name|titlecase}}:
+    type: application
+    platform: iOS
+    sources: Sources/{{.Name|titlecase}}
+    {{if or $client.HasBackend $client.HasTests}}scheme:
+      testTargets:{{if and $client.HasBackend $client.HasTests}}
+      - {{.Name|titlecase}}KitTests{{end}}{{if $client.HasTests}}
+      - {{.Name|titlecase}}UITests
+      - {{.Name|titlecase}}Tests{{end}}
+    {{if $client.HasBackend}}dependencies:
+    - target: {{.Name|titlecase}}Kit{{end}}{{end}}
+  
+  {{if $client.HasTests}}{{.Name|titlecase}}Tests:
+    type: bundle.unit-test
+    platform: iOS
+    sources: Tests/{{.Name|titlecase}}Tests
+    dependencies:
+    - target: {{.Name|titlecase}}
+  
+  {{.Name|titlecase}}UITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources: Tests/{{.Name|titlecase}}UITests
+    dependencies:
+    - target: {{.Name|titlecase}}{{end}}
+  
+  {{if $client.HasBackend}}{{.Name|titlecase}}Kit:
+    type: framework
+    platform: iOS
+    sources: Sources/{{.Name|titlecase}}Kit
+    {{if $client.HasTests}}scheme:
+      testTargets:
+      - {{.Name|titlecase}}KitTests{{end}}{{end}}
+  
+  {{if and $client.HasBackend $client.HasTests}}{{.Name|titlecase}}KitTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources: Tests/{{.Name|titlecase}}KitTests
+    dependencies:
+    - target: {{.Name|titlecase}}Kit{{end}}
