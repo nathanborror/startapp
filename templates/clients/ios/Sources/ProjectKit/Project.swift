@@ -1,11 +1,11 @@
+{{ $name := .IOSClient.Name }}
 import Foundation
 
-public let {{.Name|titlecase}}DidChangeNotification = Notification.Name("{{.Name}}DidChangeNotification")
+public let {{$name}}DidChangeNotification = Notification.Name("{{$name}}DidChangeNotification")
 
-public struct {{.Name|titlecase}} {
+public struct {{$name}} {
     
     public static var state: State { return manager.state }
-    public static let bundleIdentifier = "{{.IOSClient.BundleID}}"
 
     fileprivate(set) static var current: Service = Service(.localhost)
     
@@ -45,11 +45,11 @@ public class Service {
     private func managerStateChanged(state: State) {
         let nc = NotificationCenter.default
         if Thread.isMainThread {
-            nc.post(name: {{.Name|titlecase}}DidChangeNotification, object: nil)
+            nc.post(name: {{$name}}DidChangeNotification, object: nil)
             return
         }
         DispatchQueue.main.async {
-            nc.post(name: {{.Name|titlecase}}DidChangeNotification, object: nil)
+            nc.post(name: {{$name}}DidChangeNotification, object: nil)
         }
     }
 

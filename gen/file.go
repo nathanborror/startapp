@@ -35,6 +35,8 @@ func (f *File) Write(elem ...string) {
 		f.err = fmt.Errorf("Missing directory")
 		return
 	}
+
+	// Create directory if missing
 	dir := filepath.Join(elem...)
 	if _, err := os.Stat(dir); os.IsNotExist(err) {
 		if err := os.MkdirAll(dir, 0755); err != nil {
@@ -42,10 +44,17 @@ func (f *File) Write(elem ...string) {
 			return
 		}
 	}
+
+	// Write file if missing
 	filePath := filepath.Join(dir, f.filename())
-	if err := ioutil.WriteFile(filePath, f.buf.Bytes(), 0644); err != nil {
-		f.err = err
-		return
+	if _, err := os.Stat(filePath); os.IsNotExist(err) {
+		if err := ioutil.WriteFile(filePath, f.buf.Bytes(), 0644); err != nil {
+			f.err = err
+			return
+		}
+		fmt.Printf("\tCreated File: %s\n", filePath)
+	} else {
+		fmt.Printf("\tFile Already Exists: %s\n", filePath)
 	}
 }
 
@@ -101,17 +110,17 @@ func (f *File) printf(format string, args ...interface{}) {
 
 func (f *File) WriteAPIResolver(projectPath string, t def.TypeDef) {
 	f.printf("package api")
-	f.printf("import ( \"%s/%s\"", projectPath, "state")
-	f.printf("graphql \"github.com/neelance/graphql-go\" )")
+	f.printf("import ( graphql \"github.com/neelance/graphql-go\" )")
 
-	f.printf("type %sResolver struct {", strings.ToLower(t.Name))
-	f.printf("%s *state.%s", strings.ToLower(t.Name), t.Name)
+	f.printf("type %sResolver struct {", lowerFirstLetter(t.Name))
+	f.printf("%s *state.%s", lowerFirstLetter(t.Name), t.Name)
+	f.printf("*Backends")
 	f.printf("}")
 
 	for _, field := range t.Fields {
 		if field.Type.IsScalar {
-			f.printf("func (r *%sResolver) %s() %s {", strings.ToLower(t.Name), strings.Title(field.Name), def.ToGoScalar(field.Type.Name))
-			f.printf("return r.%s.%s", strings.ToLower(t.Name), strings.Title(field.Name))
+			f.printf("func (r *%sResolver) %s() %s {", lowerFirstLetter(t.Name), strings.Title(field.Name), def.ToGoScalar(field.Type.Name))
+			f.printf("return r.%s.%s", lowerFirstLetter(t.Name), strings.Title(field.Name))
 			f.printf("}\n")
 			continue
 		}
@@ -123,7 +132,7 @@ func (f *File) WriteAPIResolver(projectPath string, t def.TypeDef) {
 			f.printf("// Implement Interface: %s\n", field.Name)
 			continue
 		}
-		f.printf("func (r *%sResolver) %s() (*state.%s, error) {", strings.ToLower(t.Name), strings.Title(field.Name), def.ToGoScalar(field.Type.Name))
+		f.printf("func (r *%sResolver) %s() (%s*%sResolver, error) {", lowerFirstLetter(t.Name), strings.Title(field.Name), isList(field.Type), lowerFirstLetter(field.Type.Name))
 		f.printf("return nil, fmt.Errorf(\"Not Implemented\")")
 		f.printf("}\n")
 	}
@@ -153,4 +162,18 @@ func (f *File) WriteScalars(scalars []def.TypeDef) {
 		f.printf("return fmt.Errorf(\"Not Implemented\")")
 		f.printf("}\n")
 	}
+}
+
+func isList(in def.TypeDef) string {
+	if in.IsList && in.IsOptional {
+		return "*[]"
+	}
+	if in.IsList && !in.IsOptional {
+		return "[]"
+	}
+	return ""
+}
+
+func lowerFirstLetter(in string) string {
+	return strings.ToLower(string(in[0])) + in[1:len(in)]
 }

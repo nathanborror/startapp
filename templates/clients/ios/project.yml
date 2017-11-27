@@ -1,46 +1,50 @@
 {{ $client := .IOSClient }}
-name: {{.Name|titlecase}}
+{{ $name := .IOSClient.Name }}
+{{ $domain := .IOSClient.BundleDomain }}
+{{ $teamID := .IOSClient.TeamID }}
+name: {{$name}}
 settings:
-  PRODUCT_BUNDLE_IDENTIFIER: co.nthn.$(PRODUCT_NAME)
-  DEVELOPMENT_TEAM: {{$client.TeamID}}
+  PRODUCT_BUNDLE_IDENTIFIER: {{$domain}}.$(PRODUCT_NAME)
+  DEVELOPMENT_TEAM: {{$teamID}}
+  IPHONEOS_DEPLOYMENT_TARGET: 11.0
 targets:
-  {{.Name|titlecase}}:
+  {{$name}}:
     type: application
     platform: iOS
-    sources: Sources/{{.Name|titlecase}}
+    sources: Sources/{{$name}}
     {{if or $client.HasBackend $client.HasTests}}scheme:
       testTargets:{{if and $client.HasBackend $client.HasTests}}
-      - {{.Name|titlecase}}KitTests{{end}}{{if $client.HasTests}}
-      - {{.Name|titlecase}}UITests
-      - {{.Name|titlecase}}Tests{{end}}
+      - {{$name}}KitTests{{end}}{{if $client.HasTests}}
+      - {{$name}}UITests
+      - {{$name}}Tests{{end}}
     {{if $client.HasBackend}}dependencies:
-    - target: {{.Name|titlecase}}Kit{{end}}{{end}}
+    - target: {{$name}}Kit{{end}}{{end}}
   
-  {{if $client.HasTests}}{{.Name|titlecase}}Tests:
+  {{if $client.HasTests}}{{$name}}Tests:
     type: bundle.unit-test
     platform: iOS
-    sources: Tests/{{.Name|titlecase}}Tests
+    sources: Tests/{{$name}}Tests
     dependencies:
-    - target: {{.Name|titlecase}}
+    - target: {{$name}}
   
-  {{.Name|titlecase}}UITests:
+  {{$name}}UITests:
     type: bundle.ui-testing
     platform: iOS
-    sources: Tests/{{.Name|titlecase}}UITests
+    sources: Tests/{{$name}}UITests
     dependencies:
-    - target: {{.Name|titlecase}}{{end}}
+    - target: {{$name}}{{end}}
   
-  {{if $client.HasBackend}}{{.Name|titlecase}}Kit:
+  {{if $client.HasBackend}}{{$name}}Kit:
     type: framework
     platform: iOS
-    sources: Sources/{{.Name|titlecase}}Kit
+    sources: Sources/{{$name}}Kit
     {{if $client.HasTests}}scheme:
       testTargets:
-      - {{.Name|titlecase}}KitTests{{end}}{{end}}
+      - {{$name}}KitTests{{end}}{{end}}
   
-  {{if and $client.HasBackend $client.HasTests}}{{.Name|titlecase}}KitTests:
+  {{if and $client.HasBackend $client.HasTests}}{{$name}}KitTests:
     type: bundle.unit-test
     platform: iOS
-    sources: Tests/{{.Name|titlecase}}KitTests
+    sources: Tests/{{$name}}KitTests
     dependencies:
-    - target: {{.Name|titlecase}}Kit{{end}}
+    - target: {{$name}}Kit{{end}}

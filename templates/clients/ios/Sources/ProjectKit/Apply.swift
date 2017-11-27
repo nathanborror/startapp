@@ -1,3 +1,4 @@
+{{ $name := .IOSClient.Name }}
 import Foundation
 
 extension State {
@@ -7,10 +8,6 @@ extension State {
         self.authorization = Authorization()
         self.error = nil
     }
-
-    mutating func apply(error: Error?) {
-        self.error = error
-    }
 }
 
 extension Authorization {
@@ -19,10 +16,6 @@ extension Authorization {
         self.token = nil
         self.stage = .disconnected
         self.error = nil
-    }
-
-    mutating func apply(error: Error?) {
-        self.error = error
     }
 }
 
@@ -44,9 +37,5 @@ extension Account {
         self.email = remote.email ?? self.email
         self.created = Date(rfc3339String: remote.created) ?? self.created
         self.modified = Date(rfc3339String: remote.modified) ?? self.modified
-    }
-
-    mutating func apply(error: Error?) {
-        self.error = error
     }
 }

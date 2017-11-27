@@ -42,18 +42,56 @@ func readFileContents(filename string) string {
 	return string(file)
 }
 
-// Encoders
+// Arguments
 
-func encodeID(i string) graphql.ID {
-	return graphql.ID(i)
+type connectionArgs struct {
+	First  *int32
+	Before *string
 }
 
-func encodeTime(t time.Time) string {
-	return t.UTC().Format(time.RFC3339)
+// Encoders
+
+func encodeID(in string) graphql.ID {
+	return graphql.ID(in)
+}
+
+func encodeTime(in time.Time) string {
+	return in.UTC().Format(time.RFC3339)
+}
+
+func encodeCursor(in string) string {
+	return base64.StdEncoding.EncodeToString([]byte(in))
+}
+
+func encodePageInfo(in state.PageInfo) *pageInfoResolver {
+	return &pageInfoResolver{
+		startID:     in.StartID,
+		endID:       in.EndID,
+		hasNext:     in.HasNext,
+		hasPrevious: in.HasPrevious,
+	}
 }
 
 // Decoders
 
-func decodeID(i graphql.ID) string {
-	return string(i)
+func decodeID(in graphql.ID) string {
+	return string(in)
+}
+
+func decodeCursor(in string) string {
+	str, err := base64.StdEncoding.DecodeString(in)
+	if err != nil {
+		return ""
+	}
+	return string(str)
+}
+
+// Conversions
+
+func int32toIntPtr(in *int32) *int {
+	if in == nil {
+		return nil
+	}
+	out := int(*in)
+	return &out
 }

@@ -8,3 +8,11 @@ Dependencies:
 
 - https://github.com/mjibson/esc
 - https://github.com/yonaskolb/XcodeGen
+
+## Tasks
+
+- [ ] Support recursive connection types in generated Swift code
+- [ ] Ignore ID scalar in favor of neelance/go-graphql's implementation
+- [ ] Fix mutation arguments in Swift
+- [x] Fix camelCase on Swift mutation strings
+- [ ] Swift connection edges aren't generating `edges: [Edge]` correctly

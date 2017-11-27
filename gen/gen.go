@@ -35,12 +35,13 @@ type Project struct {
 }
 
 type Client struct {
-	Kind       ClientKind
-	BundleID   string // The bundle identifier e.g. com.example.ProjectName
-	TeamID     string // Team identifier, generally used for iOS clients
-	HasBackend bool
-	HasTests   bool
-	Templates  TemplateFiles
+	Kind         ClientKind
+	Name         string
+	BundleDomain string // The bundle identifier domain e.g. com.example
+	TeamID       string // Team identifier, generally used for iOS clients
+	HasBackend   bool
+	HasTests     bool
+	Templates    TemplateFiles
 }
 
 type ClientKind string
@@ -62,15 +63,17 @@ func NewProject(name string, dest string, domain string) *Project {
 	}
 }
 
-// AddClient appends a new client to the Project.
-func (p *Project) AddClient(kind ClientKind, bundleID string, teamID string, hasBackend bool, hasTests bool) {
+// AddIOSClient appends a new iOS client to the Project.
+func (p *Project) AddIOSClient(name string, teamID string, hasBackend bool, hasTests bool) {
+	fmt.Printf("Adding iOS client: %s\n", name)
 	client := Client{
-		Kind:       kind,
-		BundleID:   bundleID,
-		TeamID:     teamID,
-		HasBackend: hasBackend,
-		HasTests:   hasTests,
-		Templates:  make(TemplateFiles),
+		Kind:         IOSClientKind,
+		Name:         name,
+		BundleDomain: reverseDomain(p.Domain),
+		TeamID:       teamID,
+		HasBackend:   hasBackend,
+		HasTests:     hasTests,
+		Templates:    make(TemplateFiles),
 	}
 	p.Clients = append(p.Clients, client)
 }
@@ -78,6 +81,7 @@ func (p *Project) AddClient(kind ClientKind, bundleID string, teamID string, has
 // ReadGraphQLSchema reads a GraphQL schema and adds a new Definition to the
 // Project that will be used when rendering project templates.
 func (p *Project) ReadGraphQLSchema(filename string) {
+	fmt.Printf("Using GraphQL schema: %s\n", filename)
 	if p.err != nil {
 		return
 	}
@@ -100,10 +104,14 @@ func (p *Project) Write() {
 	if p.err != nil {
 		return
 	}
+	fmt.Println("Writing Templates...")
 	p.ReadTemplates(_escData)
-	p.WriteFiles()
-	p.ScaffoldAPI()
-	p.ScaffoldGraphQL()
+	fmt.Println("Writing template files...")
+	p.WriteTemplateFiles()
+	fmt.Println("Writing Go API scaffolding...")
+	p.WriteGoScaffoldingForAPI()
+	fmt.Println("Writing Swift GraphQL scaffolding...")
+	p.WriteSwiftScaffoldingForGraphQL()
 }
 
 // Err returns the first encountered error.
@@ -144,8 +152,8 @@ func (p *Project) ReadTemplates(templates map[string]*_escFile) {
 	}
 }
 
-// WriteFiles writes all rendered templates to the file system.
-func (p *Project) WriteFiles() {
+// WriteTemplateFiles writes all rendered templates to the file system.
+func (p *Project) WriteTemplateFiles() {
 	p.writeTemplates(p.Templates)
 	for _, client := range p.Clients {
 		p.writeTemplates(client.Templates)
@@ -169,8 +177,8 @@ func (p *Project) Copy(filename string) {
 	file.PanicOnErr()
 }
 
-// ScaffoldAPI writes all the api scaffolding.
-func (p *Project) ScaffoldAPI() {
+// WriteGoScaffoldingForAPI writes all the api scaffolding.
+func (p *Project) WriteGoScaffoldingForAPI() {
 	root := filepath.Join(p.dest, p.Name)
 	dir := "api"
 
@@ -204,10 +212,10 @@ func (p *Project) ScaffoldAPI() {
 	}
 }
 
-// ScaffoldGraphQL writes empty '.graphql' files to the client's iOS GraphQL
-// directory. Use these stubs to write your GraphQL queries for your clients
-// to invoke.
-func (p *Project) ScaffoldGraphQL() {
+// WriteSwiftScaffoldingForGraphQL writes empty '.graphql' files to the client's
+// iOS GraphQL directory. Use these stubs to write your GraphQL queries for your
+// clients to invoke.
+func (p *Project) WriteSwiftScaffoldingForGraphQL() {
 	var iosClient Client
 
 	// Find iOS Client
@@ -275,7 +283,7 @@ func (p *Project) writeTemplate(name string, filename string) {
 
 	// Check if file already exists
 	if _, err := os.Stat(writename); !os.IsNotExist(err) {
-		fmt.Printf("File Already Exists: %s\n", filename)
+		fmt.Printf("\tFile Already Exists: %s\n", filename)
 		return
 	}
 
@@ -327,5 +335,18 @@ func (p *Project) writeTemplate(name string, filename string) {
 
 	// Close file
 	file.Close()
-	fmt.Println("Created file: ", writename)
+	fmt.Println("\tCreated File: ", writename)
+}
+
+func reverseDomain(in string) string {
+	s := strings.Split(in, ".")
+	reverse(s)
+	return strings.Join(s, ".")
+}
+
+func reverse(in []string) {
+	last := len(in) - 1
+	for i := 0; i < len(in)/2; i++ {
+		in[i], in[last-i] = in[last-i], in[i]
+	}
 }

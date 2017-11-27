@@ -1,3 +1,4 @@
+{{ $name := .IOSClient.Name }}
 import XCTest
 
 class Tests: XCTestCase {

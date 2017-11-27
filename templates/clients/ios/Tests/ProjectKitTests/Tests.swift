@@ -1,5 +1,6 @@
+{{ $name := .IOSClient.Name }}
 import XCTest
-@testable import {{.Name|titlecase}}Kit
+@testable import {{$name}}Kit
 
 class Tests: XCTestCase {
     
@@ -8,16 +9,11 @@ class Tests: XCTestCase {
     override func setUp() {
         super.setUp()
         session = MockRemoteSession()
-        {{.Name|titlecase}}.replace(service: Service(.localhost, session: session))
+        {{$name}}.replace(service: Service(.localhost, session: session))
     }
     
     override func tearDown() {
         super.tearDown()
         session = nil
-    }
-    
-    func testServicePing() {
-        session.nextData = "{}".data(using: .utf8)
-        {{.Name|titlecase}}.ping()
     }
 }

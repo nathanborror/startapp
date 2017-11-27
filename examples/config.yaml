@@ -1,5 +1,6 @@
 domain: example.com
-schema: schema.graphql
-has-client-backend: true
-has-client-tests: true
-has-client-bundleid: com.example.Example
+graphql-schema: schema.graphql
+ios-backend-scaffolding: true
+ios-tests-scaffolding: true
+ios-product-name: Example
+ios-team-id: 123ABCD456

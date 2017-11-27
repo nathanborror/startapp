@@ -9,8 +9,10 @@ import (
 )
 
 var (
+	// ErrRecordNotFound means the record was not found.
 	ErrRecordNotFound = errors.New("Record not found")
-	ErrRecordInvalid  = errors.New("Record invalid")
+	// ErrRecordInvalid means the record is invalid.
+	ErrRecordInvalid = errors.New("Record invalid")
 )
 
 // Stater is the interface that wraps all Stater interfaces.
@@ -26,12 +28,12 @@ type AuthStater interface {
 
 // AccountStater is the interface that wraps Account I/O.
 type AccountStater interface {
-	AllAccounts(first int, after int) ([]Account, error)
+	FetchAccounts(first int, after string) (*Accounts, error)
 	ReadAccount(accountID string) (*Account, error)
 	ReadAccountForEmail(email string) (*Account, error)
 	WriteAccount(in *Account, password string) (*Account, error)
 	DeleteAccount(accountID string) error
-	HistoryForAccount(accountID string) ([]Account, error)
+	HistoryForAccount(accountID string) (Accounts, error)
 	RestoreAccount(accountID string, at time.Time) (*Account, error)
 }
 

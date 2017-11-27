@@ -1,5 +1,6 @@
+{{ $name := .IOSClient.Name }}
 import XCTest
-@testable import {{.Name|titlecase}}Kit
+@testable import {{$name}}Kit
 
 class Tests: XCTestCase {
     

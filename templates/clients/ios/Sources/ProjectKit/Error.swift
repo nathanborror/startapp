@@ -1,18 +1,23 @@
+{{ $name := .IOSClient.Name }}
 import Foundation
 
-public enum {{.Name|titlecase}}Error: Error {
+public struct {{$name}}Error: Error, Codable {
+    public struct Location: Codable {
+        public let line: Int
+        public let column: Int
+    }
+    public let message: String
+    public let locations: [Location]?
 
-    case authenticationRequestBad(String)
-    case authenticationRequired(String)
-    case authenticationUnauthorized(String)
+    public var localizedDescription: String {
+        return message
+    }
+}
 
-    case requestBadType(String)
-    case requestBad(String)
-    case requestNotUnderstood(String)
-    case requestMethodNotAllowed(String)
+extension {{$name}}Error {
 
-    case notFound(String)
-    case configurationFailure(String)
-    case programmerFailure(String)
-    case serviceUnavailable(String)
+    init(remote: RemoteError) {
+        self.message = remote.message
+        self.locations = remote.locations?.map { Location(line: $0.line, column: $0.column) }
+    }
 }

@@ -40,6 +40,7 @@ type TypeDef struct {
 	IsOptional    bool
 	IsInterface   bool
 	IsEnum        bool
+	IsList        bool
 	EnumValues    []string
 	PossibleTypes []TypeDef
 }
@@ -137,10 +138,14 @@ func NewType(in common.Type) TypeDef {
 	case *graphql.InputObject:
 		out.Name = t.Name
 		out.Fields = NewFieldInputs(t.Values)
+	case *common.List:
+		out.Name = t.OfType.String()
+		out.IsList = true
 	case *common.NonNull:
 		out = NewType(t.OfType)
 		out.IsOptional = false
 	default:
+		fmt.Printf("> %#v\n", t)
 		break
 	}
 	return out

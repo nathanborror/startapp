@@ -1,10 +1,16 @@
+{{ $name := .IOSClient.Name }}
 import UIKit
-import {{.Name|titlecase}}Kit
+import {{$name}}Kit
 
-class HomeController: UIViewController {
+class HomeController: AppViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        title = "{{.Name|titlecase}}"
+
+        title = "{{$name}}"
+    }
+
+    override func stateDidChange(_ state: State) {
+        super.stateDidChange(state)
     }
 }

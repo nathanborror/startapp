@@ -24,6 +24,11 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		Variables     map[string]interface{} `json:"variables"`
 	}
 
+	// Require POST
+	if r.Method != http.MethodPost {
+		http.Error(w, "RequestMethodNotAllowed: Must be POST request", 405)
+	}
+
 	// Read request body
 	data, err := ioutil.ReadAll(r.Body)
 	if err != nil {

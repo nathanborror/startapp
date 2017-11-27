@@ -36,6 +36,13 @@ func NewState(cfg map[string]string) state.Stater {
 	}
 	db.MustExec(ledger.Schema)
 	db.MustExec(`
+		CREATE TABLE IF NOT EXISTS edge (
+			added_id serial PRIMARY KEY,
+			from_id uuid NOT NULL,
+			to_id uuid NOT NULL,
+			kind varchar(255) NOT NULL,
+			UNIQUE(from_id, to_id, kind)
+		);
 		CREATE TABLE IF NOT EXISTS index_account_email (
 			added_id serial PRIMARY KEY,
 			account_id uuid NOT NULL UNIQUE,
@@ -61,7 +68,7 @@ func (m *manager) WriteAuthToken(accountID string, token string) error {
 
 // Account Stater
 
-func (m *manager) AllAccounts(first int, after int) ([]state.Account, error) {
+func (m *manager) FetchAccounts(first int, after string) (*state.Accounts, error) {
 	return nil, fmt.Errorf("Not Implemented")
 }
 
@@ -81,7 +88,7 @@ func (m *manager) DeleteAccount(accountID string) error {
 	return fmt.Errorf("Not Implemented")
 }
 
-func (m *manager) HistoryForAccount(accountID string) ([]state.Account, error) {
+func (m *manager) HistoryForAccount(accountID string) (*state.Accounts, error) {
 	return nil, fmt.Errorf("Not Implemented")
 }
 
