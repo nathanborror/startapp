@@ -4,6 +4,7 @@ import (
 	"log"
 	"strings"
 	"time"
+	"fmt"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/nathanborror/{{.Name}}/pkg/ledger"
@@ -51,39 +52,51 @@ func NewState(cfg map[string]string) state.Stater {
 // Auth Stater
 
 func (m *manager) ReadAuthToken(token string) (string, error) {
-	return "", nil
+	return "", fmt.Errorf("Not Implemented")
 }
 
 func (m *manager) WriteAuthToken(accountID string, token string) error {
-	return nil
+	return fmt.Errorf("Not Implemented")
 }
 
 // Account Stater
 
 func (m *manager) AllAccounts(first int, after int) ([]state.Account, error) {
-	return nil, nil
+	return nil, fmt.Errorf("Not Implemented")
 }
 
 func (m *manager) ReadAccount(accountID string) (*state.Account, error) {
-	return nil, nil
+	return nil, fmt.Errorf("Not Implemented")
 }
 
 func (m *manager) ReadAccountForEmail(email string) (*state.Account, error) {
-	return nil, nil
+	return nil, fmt.Errorf("Not Implemented")
 }
 
 func (m *manager) WriteAccount(in *state.Account, password string) (*state.Account, error) {
-	return nil, nil
+	return nil, fmt.Errorf("Not Implemented")
 }
 
 func (m *manager) DeleteAccount(accountID string) error {
-	return nil
+	return fmt.Errorf("Not Implemented")
 }
 
 func (m *manager) HistoryForAccount(accountID string) ([]state.Account, error) {
-	return nil, nil
+	return nil, fmt.Errorf("Not Implemented")
 }
 
 func (m *manager) RestoreAccount(accountID string, at time.Time) (*state.Account, error) {
-	return nil, nil
+	return nil, fmt.Errorf("Not Implemented")
+}
+
+// Private
+
+func wrapErr(err error) error {
+	if err == sql.ErrNoRows {
+		return state.ErrRecordNotFound
+	}
+	if err == ledger.ErrRecordNotFound {
+		return state.ErrRecordNotFound
+	}
+	return err
 }

@@ -1,8 +1,16 @@
 package state
 
 import (
+	"errors"
 	"log"
 	"time"
+
+	"golang.org/x/crypto/bcrypt"
+)
+
+var (
+	ErrRecordNotFound = errors.New("Record not found")
+	ErrRecordInvalid  = errors.New("Record invalid")
 )
 
 // Stater is the interface that wraps all Stater interfaces.
@@ -42,3 +50,12 @@ func NewState(kind string, cfg map[string]string) Stater {
 }
 
 var backends = make(map[string]Backend)
+
+// EncryptPassword returns an encrypted password.
+func EncryptPassword(in string) string {
+	pass, err := bcrypt.GenerateFromPassword([]byte(in), bcrypt.DefaultCost)
+	if err != nil {
+		panic(err)
+	}
+	return string(pass)
+}

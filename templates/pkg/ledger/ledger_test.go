@@ -219,7 +219,7 @@ func TestDeleteRecord(t *testing.T) {
 	if mock.Name != "" {
 		t.Errorf("name '%s' should be empty", mock.Name)
 	}
-	if !rec.IsEmpty() {
+	if !rec.IsZero() {
 		t.Errorf("rec not empty: %s", string(rec.Data))
 	}
 }

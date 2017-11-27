@@ -39,7 +39,7 @@ func TestEmptyAuthorizationHeader(t *testing.T) {
 	if err := session.Err(); err != nil {
 		t.Error(err)
 	}
-	if !session.IsEmpty() {
+	if !session.IsZero() {
 		t.Errorf("not empty: %+v", session)
 	}
 }
@@ -71,7 +71,7 @@ func TestFromContext(t *testing.T) {
 	if err := session.Err(); err != nil {
 		t.Error(err)
 	}
-	if session.IsEmpty() {
+	if session.IsZero() {
 		t.Errorf("%+v == empty", session)
 	}
 }

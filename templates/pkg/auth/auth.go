@@ -61,7 +61,7 @@ func (s *Session) Context(ctx context.Context) context.Context {
 	return context.WithValue(ctx, sessionKey, s)
 }
 
-func (s *Session) IsEmpty() bool {
+func (s *Session) IsZero() bool {
 	return s.ID == "" || s.Token == ""
 }
 

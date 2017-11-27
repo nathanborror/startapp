@@ -14,6 +14,7 @@ import (
 var (
 	ErrInvalidQueryColumns = errors.New("Invalid query colums, expecting: 'added_id, id, datatype, data, time'")
 	ErrInvalidTableName    = errors.New("Invalid query table name, expecting: 'FROM record'")
+	ErrRecordNotFound      = errors.New("Record not found")
 )
 
 var emptyData = []byte("{}")
@@ -139,6 +140,9 @@ func (r *RecordSet) Scan(v Applier) {
 
 // Err returns the first error that was encountered by the Record Set.
 func (r *RecordSet) Err() error {
+	if r.err == sql.ErrNoRows {
+		return ErrRecordNotFound
+	}
 	return r.err
 }
 
@@ -216,8 +220,8 @@ func (r *Record) Err() error {
 	return r.err
 }
 
-// IsEmpty reports whether r represents an empty record.
-func (r *Record) IsEmpty() bool {
+// IsZero reports whether r represents an empty record.
+func (r *Record) IsZero() bool {
 	return bytes.Compare(r.Data, emptyData) == 0
 }
 
